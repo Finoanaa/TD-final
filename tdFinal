@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  title: Football Competition Management API
+  description: An API to manage football competitions, teams, and players.
+  version: 1.0.0
+
+servers:
+- url: https://api.football-competition.com
+
+paths:
+  /competitions:
+    post:
+      summary: Create a new competition
+      operationId: createCompetition
+      requestBody:
+       required: true
+       content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Competition'
+      responses:
+      '201':
+      description: Competition created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Competition'
+
+    get:
+      summary: Get a list of competitions
+      operationId: getCompetitions
+      parameters:
+       - name: page
+         in: query
+         required: true
+         schema:
+          type: integer
+          example: 1
+       - name: pageSize
+         in: query
+         required: true
+         schema:
+          type: integer
+          example: 10
+      responses:
+      '200':
+      description: A paginated list of competitions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              competitions:
+                type: array
+                items:
+                 $ref: '#/components/schemas/Competition'
+              page:
+                type: integer
+              pageSize:
+                type: integer
+
+  /teams:
+   post:
+    summary: Create a new team
+    operationId: createTeam
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Team'
+    responses:
+    '201':
+      description: Team created successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Team'
+
+   get:
+    summary: Get a list of teams
+    operationId: getTeams
+    parameters:
+      - name: teamName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          example: 1
+      - name: pageSize
+        in: query
+        required: true
+        schema:
+          type: integer
+          example: 10
+   responses:
+  '200':
+  description: A paginated list of teams
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          teams:
+            type: array
+            items:
+              $ref: '#/components/schemas/Team'
+          page:
+            type: integer
+          pageSize:
+            type: integer
+
+  /teams/{teamId}/players:
+   post:
+    summary: Assign players to a team
+    operationId: assignPlayersToTeam
+    parameters:
+      - name: teamId
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Player'
+    responses:
+    '200':
+    description: Players assigned successfully
+
+   get:
+    summary: Get a list of players for a team
+    operationId: getPlayersForTeam
+    parameters:
+      - name: teamId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: playerName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: true
+        schema:
+          type: integer
+          example: 1
+      - name: pageSize
+        in: query
+        required: true
+        schema:
+          type: integer
+          example: 10
+    responses:
+    '200':
+    description: A paginated list of players for the team
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            players:
+              type: array
+              items:
+                $ref: '#/components/schemas/Player'
+            page:
+              type: integer
+            pageSize:
+              type: integer
+
+  components:
+    schemas:
+    Competition:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      location:
+        type: string
+
+    Team:
+      type: object
+      properties:
+       id:
+        type: string
+       name:
+        type: string
+       slogan:
+        type: string
+      competitions:
+        type: array
+        items:
+          $ref: '#/components/schemas/Competition'
+      players:
+        type: array
+        items:
+          $ref: '#/components/schemas/Player'
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        number:
+          type: integer
+        strongFoot:
+          type: string
+          enum:
+            - Left
+            - Right
